@@ -39,7 +39,7 @@ echo SERVER_DOMAIN=fredriklowenhamn.com > .env
 
 # Start containers
 ```
-docker-compose up -d ptraefik presentation
+docker-compose up -d traefik presentation
 docker-compose up -d
 ```
 
