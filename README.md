@@ -24,6 +24,27 @@ Do one of the following:
 ## Clone repo
 * Clone this repo to your machine and go to the *docker-ci-demo* folder.
 
+## If you want to run this on anything other than a registered domain (locally or docker-machine)
+* - Use `dnsmasq` for DNS partial matches (wildcard), guide here: https://www.stevenrombauts.be/2018/01/use-dnsmasq-instead-of-etc-hosts/
+* - Setup self signed certificates (traefik wont be able to generate real ones). inspo: https://github.com/wekan/wekan/wiki/Traefik-and-self-signed-SSL-certs
+```shell
+# create certs
+mkdir -p build/traefik/certs
+cd build/traefik/certs
+sudo openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout traefikKey.key -out traefikCert.crt
+cd ../..
+sudo chmod 755 traefik
+sudo chmod 750 traefik/certs
+chmod 644 traefik/certs/traefikCert.crt
+chmod 600 traefik/certs/traefikKey.key
+```
+Then uncomment theese lines in traefik config file
+```shell
+[[entryPoints.https.tls.certificates]]
+  certFile = "/certs/traefikCert.crt"
+  keyFile = "/certs/traefikKey.key"
+```
+
 ## Network
 Create the network that is used by all apps.
 ```
@@ -39,7 +60,7 @@ echo SERVER_DOMAIN=fredriklowenhamn.com > .env
 
 # Start containers
 ```
-docker-compose up -d ptraefik presentation
+docker-compose up -d traefik presentation
 docker-compose up -d
 ```
 
@@ -66,7 +87,7 @@ If this fails, go to https://docker.fredriklowenhamn.com and try again afterward
 
 Edit .env file  
 ```
-echo COOKIE_SECRET=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 32 | head -n 1)  >> .env  
+echo COOKIE_SECRET=$(LC_ALL=C tr -dc 'A-Za-z0-9' < /dev/urandom | fold -w 32 | head -n 1)  >> .env  
 echo CLIENT_ID=(Application Id) >> .env  
 echo CLIENT_SECRET=(Application Secret) >> .env 
 ```
