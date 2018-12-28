@@ -38,11 +38,16 @@ sudo chmod 750 traefik/certs
 chmod 644 traefik/certs/traefikCert.crt
 chmod 600 traefik/certs/traefikKey.key
 ```
-Then uncomment theese lines in traefik config file
+1. Comment the lines under [acme]
+2. Then uncomment the following lines in traefik config file
 ```shell
 [[entryPoints.https.tls.certificates]]
   certFile = "/certs/traefikCert.crt"
   keyFile = "/certs/traefikKey.key"
+```
+3. And finally uncomment this line in traefik Dockerfile
+```shell
+COPY certs /certs
 ```
 
 ## Network
