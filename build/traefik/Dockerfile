@@ -1,2 +1,3 @@
 FROM traefik
-ADD traefik-public.toml /toml/traefik-public.toml
+COPY traefik-public.toml /toml/traefik-public.toml
+# COPY certs /certs
