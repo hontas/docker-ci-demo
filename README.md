@@ -1,4 +1,5 @@
 # docker-ci-demo
+> For docker-machine - see [docker-machine branch](https://github.com/hontas/docker-ci-demo/blob/docker-machine/README.md)
 
 ## Prerequisites:
 You will nedd the following
@@ -24,31 +25,6 @@ Do one of the following:
 ## Clone repo
 * Clone this repo to your machine and go to the *docker-ci-demo* folder.
 
-## If you want to run this on anything other than a registered domain (locally or docker-machine)
-* - Use `dnsmasq` for DNS partial matches (wildcard), guide here: https://www.stevenrombauts.be/2018/01/use-dnsmasq-instead-of-etc-hosts/
-* - Setup self signed certificates (traefik wont be able to generate real ones). inspo: https://github.com/wekan/wekan/wiki/Traefik-and-self-signed-SSL-certs
-```shell
-# create certs
-mkdir -p build/traefik/certs
-cd build/traefik/certs
-sudo openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout traefikKey.key -out traefikCert.crt
-cd ../..
-sudo chmod 755 traefik
-sudo chmod 750 traefik/certs
-chmod 644 traefik/certs/traefikCert.crt
-chmod 600 traefik/certs/traefikKey.key
-```
-1. Comment the lines under [acme]
-2. Then uncomment the following lines in traefik config file
-```shell
-[[entryPoints.https.tls.certificates]]
-  certFile = "/certs/traefikCert.crt"
-  keyFile = "/certs/traefikKey.key"
-```
-3. And finally uncomment this line in traefik Dockerfile
-```shell
-COPY certs /certs
-```
 
 ## Network
 Create the network that is used by all apps.
