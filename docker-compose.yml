@@ -1,13 +1,9 @@
 version: '3.7'
+
 services:
   # Load balancer
-  # Edit subdomains in windows hosts file:
-  # (C:\Windows\System32\Drivers\etc\hosts)
-  # Example: 
-  # 127.0.0.1       traefik.localhost
   traefik:
     container_name: traefik
-    #image: public-traefik
     build: ./build/traefik/
     restart: always
     ports:
@@ -68,29 +64,55 @@ services:
     networks:
       - core
 
+  # dns server 2 make drone work with gitlab in containerland
+  dns:
+    container_name: dns
+    image: phensley/docker-dns-rest
+    ports:
+      - 5080:80
+    volumes:
+      - /var/run/docker.sock:/docker.sock
+    networks:
+      - core
+
   # Build server
   drone-server:
     container_name: drone-server
-    image: drone/drone:0.8.6
+    image: drone/drone:1.0.0-rc.3
     restart: always
     volumes:
-      - drone:/var/lib/drone/
+      - drone:/data
     labels:
       - traefik.enable=true
-      - traefik.port=8000
+      - traefik.port=80
       - traefik.frontend.rule=Host:drone.${SERVER_DOMAIN}
     environment:
-      - DRONE_HOST=https://drone.${SERVER_DOMAIN}
-      - DRONE_GITLAB=true
-      - DRONE_GITLAB_URL=https://gitlab.${SERVER_DOMAIN}
-      - DRONE_GITLAB_PRIVATE_MODE=true
-      - GITLAB_PRIVATE_MODE=true
+      - DRONE_GIT_ALWAYS_AUTH=true
+      - DRONE_SERVER_HOST=drone.${SERVER_DOMAIN}
+      - DRONE_SERVER_PROTO=https
+      - DRONE_TLS_AUTOCERT=false
+      - DRONE_GITLAB_SERVER=https://gitlab.${SERVER_DOMAIN}
       - DRONE_GITLAB_SKIP_VERIFY=true
-      - DRONE_OPEN=true
-      - DRONE_NETWORK=core
-      - DRONE_GITLAB_CLIENT=${CLIENT_ID}
-      - DRONE_GITLAB_SECRET=${CLIENT_SECRET}
-      
+      - DRONE_GITLAB_CLIENT_ID=${CLIENT_ID}
+      - DRONE_GITLAB_CLIENT_SECRET=${CLIENT_SECRET}
+      - DRONE_RPC_SECRET=${COOKIE_SECRET}
+    networks:
+      - core
+    dns: ${DNS_IP}
+
+  #Build agent
+  drone-agent:
+    container_name: drone-agent
+    image: drone/agent:1.0.0-rc.3
+    command: agent
+    restart: always
+    depends_on:
+      - drone-server
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    environment:
+      - DRONE_RPC_SERVER=https://drone.${SERVER_DOMAIN}
+      - DRONE_RPC_SECRET=${COOKIE_SECRET}
     networks:
       - core
 
@@ -119,20 +141,6 @@ services:
          nginx['listen_https'] = false
          gitlab_rails['gitlab_signup_enabled'] = false
 
-    networks:
-      - core
-
-  #Build agent
-  drone-agent:
-    container_name: drone-agent
-    image: drone/agent:0.8.6
-    command: agent
-    restart: always
-    depends_on: [ drone-server  ]
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
-    environment:
-      - DRONE_SERVER=drone-server:9000
     networks:
       - core
 

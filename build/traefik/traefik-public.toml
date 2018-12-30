@@ -8,22 +8,12 @@ defaultEntryPoints = ["http", "https"]
     [entryPoints.http.redirect]
     entryPoint = "https"
 
-  # https is the default
   [entryPoints.https]
   address = ":443"
     [entryPoints.https.tls]
     # use self signed certificates
-    # [[entryPoints.https.tls.certificates]]
-      # certFile = "/certs/traefikCert.crt"
-      # keyFile = "/certs/traefikKey.key"
-
-# Enable ACME (Let's Encrypt): automatic SSL
-[acme]
-storage = "/config/acme-public.json"
-entryPoint = "https"
-onDemand = true
-
-  [acme.httpChallenge]
-  entryPoint = "http"
+    [[entryPoints.https.tls.certificates]]
+      certFile = "/certs/traefikCert.crt"
+      keyFile = "/certs/traefikKey.key"
 
 
