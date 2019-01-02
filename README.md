@@ -104,6 +104,7 @@ Wait for gitlab to start. https://gitlab.(domain)
 1. Change password and login (as root)
 2. Create a group called *secure*.
    All members of the group *secure* will be able to access oauth2proxy
+3. Allow requests to the local network from hooks https://gitlab.(domain)/admin/application_settings/network#js-outbound-settings [Read more on GitLab docs](https://docs.gitlab.com/ee/security/webhooks.html)  Otherwise hooks wont work with drone + DNS
 
 Test that docker registry works by logging in from host
 ```shell
@@ -135,6 +136,10 @@ docker-compose up -d
 
 ## Enable repo in drone
 * Under secrets add docker_username and docker_secret  
+
+## Disable SSL verification for webhook in GitLab
+Wont work because self-signed...
+* https://gitlab.(domain)/root/demoapp/settings/integrations
 
 ## Clone & add files
 - Clone the repo you just created 
