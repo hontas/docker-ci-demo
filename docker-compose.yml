@@ -111,10 +111,11 @@ services:
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
     environment:
-      - DRONE_RPC_SERVER=https://drone.${SERVER_DOMAIN}
+      - DRONE_RPC_SERVER=http://drone-server
       - DRONE_RPC_SECRET=${COOKIE_SECRET}
     networks:
       - core
+    dns: ${DNS_IP}
 
   # Git server
   gitlab:
