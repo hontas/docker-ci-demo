@@ -162,6 +162,9 @@ Set the label: com.centurylinklabs.watchtower.enable=true on all containers that
 # Continuous Delivery
 * Edit and push to check that the continuous delivery is working.  
 
+# ToDo
+- [ ] Make drone agent resolve gitlab.(domain) - build not working now
+
 <br><br><br><br>
 ## Template for proxy
 ```
